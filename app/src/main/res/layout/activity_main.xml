@@ -1,0 +1,273 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F5F2"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AZTEC ANALYZER AI"
+            android:textColor="#174A35"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="VERSION 3.0 · DATABASE · STATISTICAL ANALYSIS"
+            android:textColor="#617267"
+            android:textSize="11sp"
+            android:paddingBottom="14dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="DASHBOARD"
+                    android:textColor="#174A35"
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <TextView
+                    android:id="@+id/summary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Đang tải dữ liệu..."
+                    android:textSize="14sp"
+                    android:paddingTop="8dp"/>
+                <TextView
+                    android:id="@+id/riskAdvice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#A15B18"
+                    android:textSize="13sp"
+                    android:paddingTop="8dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="OCR SCANNER"
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/overlayStartButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bật nút chụp màn hình nổi"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/overlayStopButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tắt nút chụp nổi"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ocrButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chọn ảnh trong máy để OCR"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="OCR tự điền trường nhận diện. Hãy kiểm tra số liệu trước khi lưu lượt."
+                    android:textColor="#68766D"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GHI NHẬN LƯỢT CHƠI"
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <EditText
+                    android:id="@+id/betInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tiền cược (ví dụ 4.00)"
+                    android:inputType="numberDecimal"/>
+                <EditText
+                    android:id="@+id/payoutInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tiền trả thưởng (ví dụ 150.00)"
+                    android:inputType="numberDecimal"/>
+                <EditText
+                    android:id="@+id/scatterInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Số Scatter"
+                    android:inputType="number"/>
+                <com.google.android.material.checkbox.MaterialCheckBox
+                    android:id="@+id/bonusCheck"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lượt này đã kích hoạt Free Spins"/>
+                <EditText
+                    android:id="@+id/noteInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ghi chú (không bắt buộc)"
+                    android:inputType="textCapSentences"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/saveButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lưu lượt chơi"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="STATISTICAL ANALYSIS"
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <EditText
+                    android:id="@+id/windowInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Cửa sổ gần nhất (mặc định 100)"
+                    android:inputType="number"
+                    android:text="100"/>
+                <EditText
+                    android:id="@+id/deltaInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Chênh lệch tín hiệu (điểm %, mặc định 5)"
+                    android:inputType="numberDecimal"
+                    android:text="5"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/analyzeButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Phân tích và lưu snapshot"/>
+                <TextView
+                    android:id="@+id/analysisText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chưa có phân tích."
+                    android:textSize="13sp"
+                    android:paddingTop="8dp"/>
+                <TextView
+                    android:id="@+id/evaluationText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Chưa có dữ liệu đánh giá."
+                    android:textSize="13sp"
+                    android:paddingTop="10dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="DATABASE · TỐI ĐA 10.000 MẪU"
+                    android:textStyle="bold"
+                    android:textSize="17sp"/>
+                <EditText
+                    android:id="@+id/searchInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tìm theo ghi chú / loại lượt"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/searchButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Tìm kiếm"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/exportButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Xuất CSV"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/resetButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Xóa toàn bộ dữ liệu"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+                <TextView
+                    android:id="@+id/historyCount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lịch sử"
+                    android:textStyle="bold"
+                    android:paddingTop="8dp"/>
+                <LinearLayout
+                    android:id="@+id/historyContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="LƯU Ý: Tần suất lịch sử không dự báo chắc chắn RNG hoặc lượt quay kế tiếp. Snapshot được đối chiếu với kết quả thực tế tiếp theo để đo chất lượng tín hiệu, không phải cam kết dự đoán."
+            android:textColor="#65736A"
+            android:textSize="11sp"
+            android:padding="8dp"/>
+    </LinearLayout>
+</ScrollView>
