@@ -119,7 +119,8 @@ class MainActivity : AppCompatActivity() {
             val pending = Intent(CaptureOverlayService.ACTION_OCR_RESULT).apply {
                 putExtra(CaptureOverlayService.EXTRA_BET, prefs.getString(CaptureOverlayService.EXTRA_BET, ""))
                 putExtra(CaptureOverlayService.EXTRA_PAYOUT, prefs.getString(CaptureOverlayService.EXTRA_PAYOUT, ""))
-                putExtra(CaptureOverlayService.EXTRA_SCATTERS, prefs.getInt(CaptureOverlayService.EXTRA_SCATTERS, -1))
+                putExtra(CaptureOverlayService.EXTRA_SCATTERS, prefs.getInt(CaptureOverlayService.EXTRA_SCATTERS, 0))
+                putExtra(CaptureOverlayService.EXTRA_BONUS, prefs.getBoolean(CaptureOverlayService.EXTRA_BONUS, false))
                 putExtra(CaptureOverlayService.EXTRA_RAW, prefs.getString(CaptureOverlayService.EXTRA_RAW, ""))
             }
             applyOcrResult(pending)
@@ -235,7 +236,7 @@ class MainActivity : AppCompatActivity() {
             rows.isEmpty() -> "Chưa có dữ liệu. Hãy nhập thủ công hoặc dùng OCR."
             net < 0 -> "Kết quả đang âm theo lịch sử. Không tăng cược để gỡ; nên tuân thủ giới hạn ngân sách đã đặt."
             rows.size < 30 -> "Mẫu còn nhỏ; tỷ lệ quan sát có thể dao động mạnh."
-            else -> "Dashboard mô tả lịch sử đã nhập, không dự báo kết quả ngẫu nhiên tiếp theo."
+            else -> "Dashboard mô tả lịch sử đã nhập. Thuật toán chỉ phát hiện thay đổi tần suất trong dữ liệu, không dự báo RNG độc lập."
         }
     }
 
@@ -473,11 +474,14 @@ class MainActivity : AppCompatActivity() {
                 .process(InputImage.fromFilePath(this, uri))
                 .addOnSuccessListener { result ->
                     val parsed = parseScreenshot(result.text)
-                    pendingSource = "OCR_IMAGE"
-                    parsed.bet?.let { betInput.setText(it) }
-                    parsed.payout?.let { payoutInput.setText(it) }
-                    parsed.scatters?.let { scatterInput.setText(it.toString()) }
-                    Toast.makeText(this, "OCR hoàn tất. Hãy kiểm tra trường đã điền rồi bấm Lưu lượt.", Toast.LENGTH_LONG).show()
+                    saveOcrRecord(
+                        betText = parsed.bet,
+                        payoutText = parsed.payout,
+                        scatters = parsed.scatters ?: 0,
+                        bonus = parsed.bonus,
+                        source = "OCR_IMAGE",
+                        rawText = result.text
+                    )
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, "OCR thất bại: ${it.localizedMessage}", Toast.LENGTH_LONG).show()
@@ -487,7 +491,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private data class OcrFields(val bet: String?, val payout: String?, val scatters: Int?)
+    private data class OcrFields(
+        val bet: String?,
+        val payout: String?,
+        val scatters: Int?,
+        val bonus: Boolean
+    )
 
     private fun parseScreenshot(raw: String): OcrFields {
         val lines = raw.lines()
@@ -502,24 +511,62 @@ class MainActivity : AppCompatActivity() {
         val decimals = amountRegex.findAll(raw).map { it.groupValues[1].replace(',', '.') }.toList()
         val bet = amount(betLine) ?: decimals.lastOrNull { it != payout }
         val scatterCount = Regex("SCATTER", RegexOption.IGNORE_CASE).findAll(raw).count().takeIf { it > 0 }
-        return OcrFields(bet, payout, scatterCount)
+        val bonus = Regex("FREE\\s*SPINS|BONUS", RegexOption.IGNORE_CASE).containsMatchIn(raw)
+        return OcrFields(bet, payout, scatterCount, bonus)
     }
 
     private fun applyOcrResult(intent: Intent) {
         val raw = intent.getStringExtra(CaptureOverlayService.EXTRA_RAW).orEmpty()
         if (raw.startsWith("OCR_ERROR:") || raw.startsWith("CAPTURE_ERROR:")) {
             Toast.makeText(this, raw, Toast.LENGTH_LONG).show()
+            getSharedPreferences("aztec_pending", MODE_PRIVATE).edit().clear().apply()
             return
         }
         val bet = intent.getStringExtra(CaptureOverlayService.EXTRA_BET).orEmpty()
         val payout = intent.getStringExtra(CaptureOverlayService.EXTRA_PAYOUT).orEmpty()
-        val scatters = intent.getIntExtra(CaptureOverlayService.EXTRA_SCATTERS, -1)
-        pendingSource = "OCR_OVERLAY"
-        if (bet.isNotBlank()) betInput.setText(bet)
-        if (payout.isNotBlank()) payoutInput.setText(payout)
-        if (scatters >= 0) scatterInput.setText(scatters.toString())
+        val scatters = intent.getIntExtra(CaptureOverlayService.EXTRA_SCATTERS, 0).coerceAtLeast(0)
+        val bonus = intent.getBooleanExtra(CaptureOverlayService.EXTRA_BONUS, false)
         getSharedPreferences("aztec_pending", MODE_PRIVATE).edit().clear().apply()
-        Toast.makeText(this, "OCR thành công. Kiểm tra dữ liệu trước khi lưu.", Toast.LENGTH_LONG).show()
+        saveOcrRecord(bet, payout, scatters, bonus, "OCR_OVERLAY", raw)
+    }
+
+    private fun saveOcrRecord(
+        betText: String?, payoutText: String?, scatters: Int,
+        bonus: Boolean, source: String, rawText: String
+    ) {
+        if (db.count() >= SpinDb.MAX_SAMPLES) {
+            Toast.makeText(this, "Database đã đạt giới hạn ${SpinDb.MAX_SAMPLES} mẫu. Hãy xuất CSV trước khi thêm dữ liệu.", Toast.LENGTH_LONG).show()
+            return
+        }
+        val bet = betText?.let { parseMoney(it) }
+        val payout = payoutText?.let { parseMoney(it) }
+        if (bet == null || bet <= 0 || payout == null || payout < 0 || scatters < 0) {
+            Toast.makeText(this, "OCR không đủ dữ liệu hợp lệ để tự lưu. Ảnh cần có thông tin BET và WIN/TỔNG THẮNG rõ ràng.", Toast.LENGTH_LONG).show()
+            return
+        }
+        // Avoid saving the same OCR payload twice if a pending result is replayed after activity recreation.
+        val prefs = getSharedPreferences("aztec_ocr_dedup", MODE_PRIVATE)
+        val fingerprint = "$bet|$payout|$scatters|$bonus|${rawText.trim()}".hashCode().toString()
+        val now = System.currentTimeMillis()
+        if (prefs.getString("fingerprint", null) == fingerprint && now - prefs.getLong("saved_at", 0L) < 8_000L) {
+            Toast.makeText(this, "Ảnh OCR này vừa được lưu, bỏ qua bản ghi trùng.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        try {
+            db.add(Spin(
+                bet = bet,
+                payout = payout,
+                scatters = scatters,
+                bonus = bonus,
+                note = "Tự động lưu từ OCR",
+                source = source
+            ))
+            prefs.edit().putString("fingerprint", fingerprint).putLong("saved_at", now).apply()
+            refreshAll()
+            Toast.makeText(this, "OCR thành công · Đã tự động lưu lượt chơi.", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Không thể lưu dữ liệu OCR: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()

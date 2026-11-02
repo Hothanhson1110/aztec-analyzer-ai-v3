@@ -11,7 +11,7 @@ Android native application built with Kotlin, XML layouts, SQLite and Google ML 
 - Statistical snapshots: compare a recent rolling window against the preceding historical baseline.
 - Snapshot evaluation: the next actual recorded spin evaluates pending snapshots as TP / FP / TN / FN.
 - Metrics: accuracy, precision and recall for evaluated snapshots.
-- OCR from image picker and floating screenshot button. OCR fills fields directly; the user still reviews the values before saving.
+- OCR from image picker and floating screenshot button. OCR automatically saves a record to SQLite as soon as required fields are recognized; no review or confirmation is required. Invalid/incomplete OCR results are rejected, and duplicate payloads are suppressed briefly.
 - Haptic feedback after successful floating OCR.
 - High-priority notification when the configured historical-rate signal threshold is crossed.
 - Export spin history to CSV.
@@ -79,3 +79,11 @@ Replace `YOUR_USERNAME` and repository name with the new GitHub repository detai
 ## Data format
 
 Bet and payout values are stored as integer hundredths of the game's displayed unit. For example, `4.25` is stored as `425`. No conversion to VND is assumed.
+
+
+## 3.1 — Neon UI & statistical model
+
+- Giao diện dark premium với nền midnight, card xanh navy, điểm nhấn neon cyan/violet, viền card và thanh trạng thái đồng bộ.
+- Bộ lọc tín hiệu dùng Jeffreys smoothing (Beta(0.5, 0.5)), so sánh hai tỷ lệ gần đây và baseline, yêu cầu cỡ mẫu tối thiểu, mức tăng thực tế và z-score một phía ≥ 1.96.
+- Snapshot lưu tham số và chẩn đoán posterior/z-score trong trường `reason`; không cần thay đổi schema SQLite.
+- Đây là phát hiện biến động thống kê trong dữ liệu lịch sử, không thể dự báo hoặc khẳng định kết quả RNG độc lập tiếp theo.

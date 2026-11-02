@@ -172,43 +172,47 @@ class SpinDb(context: Context) : SQLiteOpenHelper(context, "aztec_v2.db", null, 
         val recent = chronological.takeLast(window)
         val previous = chronological.dropLast(recent.size)
         val recentBonus = recent.count { it.bonus }
-        val observedRate = recentBonus.toDouble() / recent.size
-        val baselineRate = if (previous.isNotEmpty()) {
-            previous.count { it.bonus }.toDouble() / previous.size
-        } else {
-            0.0
-        }
-        val minSample = minOf(30, window)
-        val hasBaseline = previous.size >= 10
-        val enoughData = recent.size >= minSample && hasBaseline
-        val signal = enoughData && observedRate >= baselineRate + (thresholdDelta / 100.0)
+        val baselineBonus = previous.count { it.bonus }
+        val nRecent = recent.size
+        val nBase = previous.size
+        val observedRate = if (nRecent > 0) recentBonus.toDouble() / nRecent else 0.0
+        val baselineRate = if (nBase > 0) baselineBonus.toDouble() / nBase else 0.0
+
+        // Jeffreys smoothing prevents a zero/100% estimate from tiny samples.
+        val recentPosterior = (recentBonus + 0.5) / (nRecent + 1.0)
+        val basePosterior = (baselineBonus + 0.5) / (nBase + 1.0)
+        val pooled = if (nRecent + nBase > 0)
+            (recentBonus + baselineBonus).toDouble() / (nRecent + nBase) else 0.0
+        val standardError = if (nRecent > 0 && nBase > 0)
+            kotlin.math.sqrt((pooled * (1.0 - pooled)) * (1.0 / nRecent + 1.0 / nBase)) else 0.0
+        val zScore = if (standardError > 0.0) (observedRate - baselineRate) / standardError else 0.0
+        val deltaObserved = (recentPosterior - basePosterior) * 100.0
+        val minRecent = maxOf(30, minOf(50, window / 2))
+        val hasBaseline = nBase >= 30
+        val enoughRecent = nRecent >= minRecent
+        val effectGate = deltaObserved >= thresholdDelta
+        val significanceGate = zScore >= 1.96 // one-sided evidence threshold, approx. 95%
+        val signal = hasBaseline && enoughRecent && effectGate && significanceGate
+
         val reason = when {
-            !hasBaseline -> "Chưa có đủ mẫu lịch sử trước cửa sổ để tạo mức nền độc lập."
-            recent.size < minSample -> "Cửa sổ chỉ có ${recent.size} mẫu; cần ít nhất $minSample mẫu."
-            signal -> "Tần suất Free Spins trong cửa sổ gần nhất cao hơn mức nền lịch sử ít nhất ${"%.1f".format(Locale.US, thresholdDelta)} điểm phần trăm."
-            else -> "Chưa đạt ngưỡng chênh lệch ${"%.1f".format(Locale.US, thresholdDelta)} điểm phần trăm so với mức nền."
+            !hasBaseline -> "Chưa đủ baseline độc lập: cần ít nhất 30 lượt trước cửa sổ; hiện có $nBase."
+            !enoughRecent -> "Cần tối thiểu $minRecent lượt trong cửa sổ; hiện có $nRecent."
+            signal -> "Tín hiệu thống kê: chênh lệch đã làm trơn ${"%.2f".format(Locale.US, deltaObserved)} điểm %, z=${"%.2f".format(Locale.US, zScore)} (đạt ngưỡng 1,96)."
+            !effectGate -> "Mức tăng đã làm trơn ${"%.2f".format(Locale.US, deltaObserved)} điểm %, thấp hơn ngưỡng ${"%.1f".format(Locale.US, thresholdDelta)} điểm %."
+            else -> "Chênh lệch chưa đủ bằng chứng thống kê (z=${"%.2f".format(Locale.US, zScore)}; cần ≥ 1,96)."
         }
 
+        val diagnostic = " Posterior gần đây=${"%.2f".format(Locale.US, recentPosterior * 100)}%; baseline=${"%.2f".format(Locale.US, basePosterior * 100)}%; z=${"%.2f".format(Locale.US, zScore)}."
         val snapshot = AnalysisSnapshot(
-            createdAt = timestamp(),
-            windowSize = window,
-            sampleCount = recent.size,
-            bonusCount = recentBonus,
-            observedRate = observedRate,
-            baselineRate = baselineRate,
-            thresholdDelta = thresholdDelta,
-            signal = signal,
-            reason = reason
+            createdAt = timestamp(), windowSize = window, sampleCount = nRecent,
+            bonusCount = recentBonus, observedRate = observedRate, baselineRate = baselineRate,
+            thresholdDelta = thresholdDelta, signal = signal, reason = reason + diagnostic
         )
         val values = ContentValues().apply {
-            put("created_at", snapshot.createdAt)
-            put("window_size", snapshot.windowSize)
-            put("sample_count", snapshot.sampleCount)
-            put("bonus_count", snapshot.bonusCount)
-            put("observed_rate", snapshot.observedRate)
-            put("baseline_rate", snapshot.baselineRate)
-            put("threshold_delta", snapshot.thresholdDelta)
-            put("signal", if (snapshot.signal) 1 else 0)
+            put("created_at", snapshot.createdAt); put("window_size", snapshot.windowSize)
+            put("sample_count", snapshot.sampleCount); put("bonus_count", snapshot.bonusCount)
+            put("observed_rate", snapshot.observedRate); put("baseline_rate", snapshot.baselineRate)
+            put("threshold_delta", snapshot.thresholdDelta); put("signal", if (snapshot.signal) 1 else 0)
             put("reason", snapshot.reason)
         }
         val id = writableDatabase.insertOrThrow("predictions", null, values)

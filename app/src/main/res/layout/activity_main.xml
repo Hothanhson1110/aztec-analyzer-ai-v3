@@ -1,7 +1,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F2F5F2"
+    android:background="#070B18"
     android:fillViewport="true">
 
     <LinearLayout
@@ -13,23 +14,29 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="AZTEC ANALYZER AI"
-            android:textColor="#174A35"
-            android:textSize="25sp"
+            android:text="AZTEC ANALYZER AI 3.1"
+            android:textColor="#66F7FF"
+            android:textSize="27sp"
+            android:letterSpacing="0.08"
             android:textStyle="bold"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="VERSION 3.0 · DATABASE · STATISTICAL ANALYSIS"
-            android:textColor="#617267"
+            android:textColor="#8B9AB8"
             android:textSize="11sp"
             android:paddingBottom="14dp"/>
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="14dp"
+            app:cardUseCompatPadding="true"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="5dp"
+            app:strokeColor="#263B66"
+            app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,21 +46,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="DASHBOARD"
-                    android:textColor="#174A35"
+                    android:textColor="#66F7FF"
                     android:textStyle="bold"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp"
+                    android:letterSpacing="0.06"/>
                 <TextView
                     android:id="@+id/summary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Đang tải dữ liệu..."
                     android:textSize="14sp"
+                    android:textColor="#E6EEFF"
                     android:paddingTop="8dp"/>
                 <TextView
                     android:id="@+id/riskAdvice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#A15B18"
+                    android:textColor="#FFCA6A"
                     android:textSize="13sp"
                     android:paddingTop="8dp"/>
             </LinearLayout>
@@ -62,7 +71,12 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="14dp"
+            app:cardUseCompatPadding="true"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="5dp"
+            app:strokeColor="#263B66"
+            app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -73,7 +87,8 @@
                     android:layout_height="wrap_content"
                     android:text="OCR SCANNER"
                     android:textStyle="bold"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp"
+                    android:letterSpacing="0.06"/>
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/overlayStartButton"
                     android:layout_width="match_parent"
@@ -94,8 +109,8 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="OCR tự điền trường nhận diện. Hãy kiểm tra số liệu trước khi lưu lượt."
-                    android:textColor="#68766D"
+                    android:text="OCR nhận diện và tự động lưu dữ liệu hợp lệ vào kho mẫu."
+                    android:textColor="#A4B4D4"
                     android:textSize="12sp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -103,7 +118,12 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="14dp"
+            app:cardUseCompatPadding="true"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="5dp"
+            app:strokeColor="#263B66"
+            app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -114,7 +134,8 @@
                     android:layout_height="wrap_content"
                     android:text="GHI NHẬN LƯỢT CHƠI"
                     android:textStyle="bold"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp"
+                    android:letterSpacing="0.06"/>
                 <EditText
                     android:id="@+id/betInput"
                     android:layout_width="match_parent"
@@ -155,7 +176,12 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="14dp"
+            app:cardUseCompatPadding="true"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="5dp"
+            app:strokeColor="#263B66"
+            app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -166,7 +192,8 @@
                     android:layout_height="wrap_content"
                     android:text="STATISTICAL ANALYSIS"
                     android:textStyle="bold"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp"
+                    android:letterSpacing="0.06"/>
                 <EditText
                     android:id="@+id/windowInput"
                     android:layout_width="match_parent"
@@ -192,6 +219,7 @@
                     android:layout_height="wrap_content"
                     android:text="Chưa có phân tích."
                     android:textSize="13sp"
+                    android:textColor="#C3D1F2"
                     android:paddingTop="8dp"/>
                 <TextView
                     android:id="@+id/evaluationText"
@@ -199,6 +227,7 @@
                     android:layout_height="wrap_content"
                     android:text="Chưa có dữ liệu đánh giá."
                     android:textSize="13sp"
+                    android:textColor="#C3D1F2"
                     android:paddingTop="10dp"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -206,7 +235,12 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="14dp"
+            app:cardUseCompatPadding="true"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="5dp"
+            app:strokeColor="#263B66"
+            app:strokeWidth="1dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -217,7 +251,8 @@
                     android:layout_height="wrap_content"
                     android:text="DATABASE · TỐI ĐA 10.000 MẪU"
                     android:textStyle="bold"
-                    android:textSize="17sp"/>
+                    android:textSize="17sp"
+                    android:letterSpacing="0.06"/>
                 <EditText
                     android:id="@+id/searchInput"
                     android:layout_width="match_parent"
@@ -266,7 +301,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="LƯU Ý: Tần suất lịch sử không dự báo chắc chắn RNG hoặc lượt quay kế tiếp. Snapshot được đối chiếu với kết quả thực tế tiếp theo để đo chất lượng tín hiệu, không phải cam kết dự đoán."
-            android:textColor="#65736A"
+            android:textColor="#8190AD"
             android:textSize="11sp"
             android:padding="8dp"/>
     </LinearLayout>

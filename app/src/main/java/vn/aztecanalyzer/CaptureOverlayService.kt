@@ -34,6 +34,7 @@ class CaptureOverlayService : Service() {
         const val EXTRA_BET = "bet"
         const val EXTRA_PAYOUT = "payout"
         const val EXTRA_SCATTERS = "scatters"
+        const val EXTRA_BONUS = "bonus"
         const val EXTRA_RAW = "raw"
         private const val CHANNEL_CAPTURE = "aztec_capture"
         private const val CHANNEL_SIGNAL = "aztec_signal"
@@ -196,7 +197,8 @@ class CaptureOverlayService : Service() {
                         .putBoolean("has_result", true)
                         .putString(EXTRA_BET, parsed.first ?: "")
                         .putString(EXTRA_PAYOUT, parsed.second ?: "")
-                        .putInt(EXTRA_SCATTERS, parsed.third ?: -1)
+                        .putInt(EXTRA_SCATTERS, parsed.third ?: 0)
+                        .putBoolean(EXTRA_BONUS, Regex("FREE\\s*SPINS|BONUS", RegexOption.IGNORE_CASE).containsMatchIn(result.text))
                         .putString(EXTRA_RAW, result.text.take(2500))
                         .apply()
 
@@ -204,7 +206,8 @@ class CaptureOverlayService : Service() {
                         setPackage(packageName)
                         putExtra(EXTRA_BET, parsed.first ?: "")
                         putExtra(EXTRA_PAYOUT, parsed.second ?: "")
-                        putExtra(EXTRA_SCATTERS, parsed.third ?: -1)
+                        putExtra(EXTRA_SCATTERS, parsed.third ?: 0)
+                        putExtra(EXTRA_BONUS, Regex("FREE\\s*SPINS|BONUS", RegexOption.IGNORE_CASE).containsMatchIn(result.text))
                         putExtra(EXTRA_RAW, result.text.take(2500))
                     }
                     sendBroadcast(out)
